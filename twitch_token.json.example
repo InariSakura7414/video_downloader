@@ -2,5 +2,6 @@
   "client_id": "",
   "client_secret": "",
   "access_token": "",
+  "auth_token": "",
   "expires_at": 1773463505.9314442
 }

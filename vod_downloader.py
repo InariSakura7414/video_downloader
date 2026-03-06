@@ -9,7 +9,26 @@ CHECK_INTERVAL = 10  # 每10秒抓一次新片段
 
 def get_m3u8_playlist_url(vod_url):
     import streamlink
-    streams = streamlink.streams(vod_url)
+    from streamlink.options import Options
+    from twitch_token import token
+
+    session = streamlink.Streamlink()
+    options = Options()
+    
+    # 取得訂閱者的網頁 Token
+    auth_token = token.get('auth_token')
+    if not auth_token:
+        raise ValueError("請在 twitch_token.json 中設定 auth_token")
+        
+    # 帶入訂閱者 Token 以取得觀看權限
+    options.set("api-header", [("Authorization", f"OAuth {auth_token}")])
+    
+    streams = session.streams(vod_url, options)
+    
+    # 提早報錯防呆
+    if not streams:
+        raise RuntimeError("無法取得串流：可能是 Token 無效、沒有訂閱該頻道，或影片不存在。")
+        
     return streams['best'].url
 
 def download_ts_segment(segment_url, save_path):
